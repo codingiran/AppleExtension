@@ -49,6 +49,7 @@ public extension FileHandle {
         }
     }
 
+    @discardableResult
     func seekToFileEnd() throws -> UInt64 {
         if #available(macOS 10.15.4, iOS 13.4, watchOS 6.2, tvOS 13.4, *) {
             return try seekToEnd()
