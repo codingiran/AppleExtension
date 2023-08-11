@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "objcexceptioncatcher",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/codingiran/ObjCExceptionCatcher.git",
+      "state" : {
+        "revision" : "ee3de0426d08d76bf19c9890256b2b63f30db7cf",
+        "version" : "1.0.0"
+      }
+    }
+  ],
+  "version" : 2
+}
