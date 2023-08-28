@@ -100,3 +100,61 @@ public extension FileHandle {
         }
     }
 }
+
+public struct ConsolePipe {
+    public struct StdType: OptionSet {
+        public static let input = StdType(rawValue: 1 << 0)
+        public static let output = StdType(rawValue: 1 << 1)
+        public static let error = StdType(rawValue: 1 << 2)
+
+        public let rawValue: Int
+        public init(rawValue: Int) {
+            self.rawValue = rawValue
+        }
+    }
+
+    private var inPipe: Pipe?
+    private var outPipe: Pipe?
+    private var errPipe: Pipe?
+
+    public init(stdType: StdType = [.input, .output, .error]) {
+        if stdType.contains(.input) {
+            inPipe = Pipe()
+        }
+        if stdType.contains(.output) {
+            outPipe = Pipe()
+        }
+        if stdType.contains(.error) {
+            errPipe = Pipe()
+        }
+    }
+
+    public func listen(_ readabilityHandler: @escaping (FileHandle) -> Void) {
+        // listen stdin
+        if let inPipe {
+            setvbuf(stdin, nil, _IONBF, 0)
+            dup2(inPipe.fileHandleForWriting.fileDescriptor, STDIN_FILENO)
+            inPipe.fileHandleForReading.readabilityHandler = { handle in
+                readabilityHandler(handle)
+            }
+        }
+
+        // listen stdout
+        if let outPipe {
+            setvbuf(stdout, nil, _IONBF, 0)
+            dup2(outPipe.fileHandleForWriting.fileDescriptor, STDOUT_FILENO)
+            outPipe.fileHandleForReading.readabilityHandler = { handle in
+                readabilityHandler(handle)
+            }
+        }
+
+        // listen stderr
+        if let errPipe {
+            setvbuf(stderr, nil, _IONBF, 0)
+            dup2(errPipe.fileHandleForWriting.fileDescriptor, STDERR_FILENO)
+            errPipe.fileHandleForReading.readabilityHandler = { handle in
+                readabilityHandler(handle)
+            }
+        }
+    }
+}

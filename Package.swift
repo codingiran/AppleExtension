@@ -27,9 +27,12 @@ let package = Package(
             name: "AppleExtension",
             dependencies: [
                 "ObjCExceptionCatcher",
-                "AppleExtensionObjC"
+                "AppleExtensionObjC",
             ]
         ),
-        .target(name: "AppleExtensionObjC"),
+        .target(
+            name: "AppleExtensionObjC",
+            publicHeadersPath: "include"
+        ),
     ]
 )
