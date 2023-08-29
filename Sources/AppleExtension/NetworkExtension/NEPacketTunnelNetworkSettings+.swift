@@ -10,9 +10,22 @@
 import NetworkExtension
 
 public extension NEPacketTunnelNetworkSettings {
-    typealias Ipv4Config = (addresses: [String], subnetMasks: [String], includedRoutes: [NEIPv4Route]?)
-    typealias Ipv6Config = (addresses: [String], networkPrefixLengths: [UInt], includedRoutes: [NEIPv6Route]?)
-    typealias DNSConfig = (servers: [String], matchDomains: [String]?)
+    struct Ipv4Config {
+        var addresses: [String]
+        var subnetMasks: [String]
+        var includedRoutes: [NEIPv4Route]?
+    }
+
+    struct Ipv6Config {
+        var addresses: [String]
+        var networkPrefixLengths: [UInt]
+        var includedRoutes: [NEIPv6Route]?
+    }
+
+    struct DNSConfig {
+        var servers: [String]
+        var matchDomains: [String]?
+    }
 
     convenience init(remoteAddress: String,
                      ipv4Config: Ipv4Config? = nil,
