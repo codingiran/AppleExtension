@@ -14,17 +14,31 @@ public extension NEPacketTunnelNetworkSettings {
         public var addresses: [String]
         public var subnetMasks: [String]
         public var includedRoutes: [NEIPv4Route]?
+        public init(addresses: [String], subnetMasks: [String], includedRoutes: [NEIPv4Route]? = nil) {
+            self.addresses = addresses
+            self.subnetMasks = subnetMasks
+            self.includedRoutes = includedRoutes
+        }
     }
 
     struct Ipv6Config {
         public var addresses: [String]
         public var networkPrefixLengths: [UInt]
         public var includedRoutes: [NEIPv6Route]?
+        public init(addresses: [String], networkPrefixLengths: [UInt], includedRoutes: [NEIPv6Route]? = nil) {
+            self.addresses = addresses
+            self.networkPrefixLengths = networkPrefixLengths
+            self.includedRoutes = includedRoutes
+        }
     }
 
     struct DNSConfig {
         public var servers: [String]
         public var matchDomains: [String]?
+        public init(servers: [String], matchDomains: [String]? = nil) {
+            self.servers = servers
+            self.matchDomains = matchDomains
+        }
     }
 
     convenience init(remoteAddress: String,
