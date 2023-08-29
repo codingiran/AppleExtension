@@ -11,20 +11,20 @@ import NetworkExtension
 
 public extension NEPacketTunnelNetworkSettings {
     struct Ipv4Config {
-        var addresses: [String]
-        var subnetMasks: [String]
-        var includedRoutes: [NEIPv4Route]?
+        public var addresses: [String]
+        public var subnetMasks: [String]
+        public var includedRoutes: [NEIPv4Route]?
     }
 
     struct Ipv6Config {
-        var addresses: [String]
-        var networkPrefixLengths: [UInt]
-        var includedRoutes: [NEIPv6Route]?
+        public var addresses: [String]
+        public var networkPrefixLengths: [UInt]
+        public var includedRoutes: [NEIPv6Route]?
     }
 
     struct DNSConfig {
-        var servers: [String]
-        var matchDomains: [String]?
+        public var servers: [String]
+        public var matchDomains: [String]?
     }
 
     convenience init(remoteAddress: String,
