@@ -101,6 +101,15 @@ public extension FileHandle {
     }
 }
 
+public extension FileHandle {
+    var availableString: String {
+        let data = availableData
+        return String(data: data, encoding: .utf8) ?? "<Non-utf8 data of size\(data.count)>"
+    }
+}
+
+/// https://stackoverflow.com/questions/53978091/using-pipe-in-swift-app-to-redirect-stdout-into-a-textview-only-runs-in-simul
+/// https://github.com/imfuxiao/Hamster/blob/0debf92cf4909cb15f4b8deee6bd1f2797974c42/General/Logger/Logger.swift#L55
 public struct ConsolePipe {
     public struct StdType: OptionSet {
         public static let input = StdType(rawValue: 1 << 0)
