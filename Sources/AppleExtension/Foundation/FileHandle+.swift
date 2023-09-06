@@ -108,45 +108,6 @@ public extension FileHandle {
     }
 }
 
-public extension FileHandle {
-    var lastLineString: String? {
-        guard let data = try? readLastLine(),
-              let str = String(data: data, encoding: .utf8)
-        else { return nil }
-        return str
-    }
-
-    func readLastLine() throws -> Data {
-        let endOffset = try seekToFileEnd()
-        // Start with an offset to skip the last newline character
-        var offset: UInt64 = 2
-        var data = Data()
-        while true {
-            let fileOffset = endOffset - offset
-            if fileOffset < 0 {
-                // Reached the beginning of the file
-                break
-            }
-
-            try seekToOffset(fileOffset)
-            let byte = try readData(upToCount: 1)
-
-            if byte == Data("\n".utf8) {
-                // Found a newline character
-                break
-            }
-
-            if let byte {
-                data.insert(contentsOf: byte, at: 0)
-            }
-            offset += 1
-        }
-
-        try closeFileHandle()
-        return data
-    }
-}
-
 /// https://stackoverflow.com/questions/53978091/using-pipe-in-swift-app-to-redirect-stdout-into-a-textview-only-runs-in-simul
 /// https://github.com/imfuxiao/Hamster/blob/0debf92cf4909cb15f4b8deee6bd1f2797974c42/General/Logger/Logger.swift#L55
 public struct ConsolePipe {
