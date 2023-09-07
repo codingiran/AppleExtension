@@ -110,7 +110,7 @@ public extension FileHandle {
 
 /// https://stackoverflow.com/questions/53978091/using-pipe-in-swift-app-to-redirect-stdout-into-a-textview-only-runs-in-simul
 /// https://github.com/imfuxiao/Hamster/blob/0debf92cf4909cb15f4b8deee6bd1f2797974c42/General/Logger/Logger.swift#L55
-public struct ConsolePipe {
+public class ConsolePipe {
     public struct StdType: OptionSet {
         public static let input = StdType(rawValue: 1 << 0)
         public static let output = StdType(rawValue: 1 << 1)
@@ -126,6 +126,8 @@ public struct ConsolePipe {
     private var outPipe: Pipe?
     private var errPipe: Pipe?
 
+    private var handler: ((FileHandle) -> Void)?
+
     public init(stdType: StdType = [.input, .output, .error]) {
         if stdType.contains(.input) {
             inPipe = Pipe()
@@ -139,12 +141,13 @@ public struct ConsolePipe {
     }
 
     public func listen(_ readabilityHandler: @escaping (FileHandle) -> Void) {
+        handler = readabilityHandler
         // listen stdin
         if let inPipe {
             setvbuf(stdin, nil, _IONBF, 0)
             dup2(inPipe.fileHandleForWriting.fileDescriptor, STDIN_FILENO)
             inPipe.fileHandleForReading.readabilityHandler = { handle in
-                readabilityHandler(handle)
+                self.handler?(handle)
             }
         }
 
@@ -153,7 +156,7 @@ public struct ConsolePipe {
             setvbuf(stdout, nil, _IONBF, 0)
             dup2(outPipe.fileHandleForWriting.fileDescriptor, STDOUT_FILENO)
             outPipe.fileHandleForReading.readabilityHandler = { handle in
-                readabilityHandler(handle)
+                self.handler?(handle)
             }
         }
 
@@ -162,8 +165,12 @@ public struct ConsolePipe {
             setvbuf(stderr, nil, _IONBF, 0)
             dup2(errPipe.fileHandleForWriting.fileDescriptor, STDERR_FILENO)
             errPipe.fileHandleForReading.readabilityHandler = { handle in
-                readabilityHandler(handle)
+                self.handler?(handle)
             }
         }
+    }
+
+    public func stopListen() {
+        handler = nil
     }
 }
