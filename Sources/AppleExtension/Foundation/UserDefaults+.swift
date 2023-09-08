@@ -23,3 +23,7 @@ public extension UserDefaults {
         return value
     }
 }
+
+public extension UserDefaults {
+    func sync() { CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication) }
+}
