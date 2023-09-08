@@ -11,7 +11,10 @@ public extension UserDefaults {
     func setCodableValue<T>(_ value: T, for key: String) where T: Codable {
         guard let data = try? JSONEncoder().encode(value),
               let json = try? JSONSerialization.jsonObject(with: data)
-        else { return }
+        else {
+            set(nil, forKey: key)
+            return
+        }
         set(json, forKey: key)
     }
 
