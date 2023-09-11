@@ -108,6 +108,22 @@ public extension FileHandle {
     }
 }
 
+public extension FileHandle {
+    func write(line: String,
+               delimiter: String? = "\n",
+               encoding: String.Encoding = .utf8,
+               append: Bool = true)
+        throws
+    {
+        if append { try seekToFileEnd() }
+        if let delimiter, let delimData = delimiter.data(using: encoding) {
+            try writeData(delimData)
+        }
+        guard let lineData = line.data(using: encoding) else { return }
+        try writeData(lineData)
+    }
+}
+
 /// https://stackoverflow.com/questions/53978091/using-pipe-in-swift-app-to-redirect-stdout-into-a-textview-only-runs-in-simul
 /// https://github.com/imfuxiao/Hamster/blob/0debf92cf4909cb15f4b8deee6bd1f2797974c42/General/Logger/Logger.swift#L55
 public class ConsolePipe {
