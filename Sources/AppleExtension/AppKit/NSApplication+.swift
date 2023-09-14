@@ -22,19 +22,26 @@ public extension NSApplication {
         }
     }
 
-    static func terminate(after action: @escaping () async -> Void, timeout: TimeInterval) {
+    enum TerminateResult {
+        case normal
+        case timeout
+    }
+
+    static func terminate(after action: @escaping () async -> Void, timeout: TimeInterval, callback: ((TerminateResult) -> Void)? = nil) {
         Task {
             let task = Task.detached(timeout: timeout) {
                 await action()
             }
             _ = try await task.value
+            callback?(.normal)
             Task { @MainActor in
-                NSApp.terminate(nil)
+                terminate()
             }
         } catch: { _ in
             // timeout
+            callback?(.timeout)
             Task { @MainActor in
-                NSApp.terminate(nil)
+                terminate()
             }
         }
     }
