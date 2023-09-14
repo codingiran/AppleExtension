@@ -79,13 +79,13 @@ private actor TimeoutActor {
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 public extension Task where Failure == Never, Success == Void {
     @discardableResult
-    init(priority: TaskPriority? = nil, operation: @escaping () async throws -> Void, catch: @escaping (Error) -> Void) {
+    init(priority: TaskPriority? = nil, operation: @escaping () async throws -> Void, catch: @escaping (Error) async -> Void) {
         self.init(priority: priority) {
             do {
                 _ = try await operation()
             }
             catch {
-                `catch`(error)
+                await `catch`(error)
             }
         }
     }

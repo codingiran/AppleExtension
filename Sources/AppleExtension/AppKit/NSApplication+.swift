@@ -27,19 +27,19 @@ public extension NSApplication {
         case timeout
     }
 
-    static func terminate(after action: @escaping () async -> Void, timeout: TimeInterval, callback: ((TerminateResult) -> Void)? = nil) {
+    static func terminate(after action: @escaping () async -> Void, timeout: TimeInterval, callback: ((TerminateResult) async -> Void)? = nil) {
         Task {
             let task = Task.detached(timeout: timeout) {
                 await action()
             }
             _ = try await task.value
-            callback?(.normal)
+            await callback?(.normal)
             Task { @MainActor in
                 terminate()
             }
         } catch: { _ in
             // timeout
-            callback?(.timeout)
+            await callback?(.timeout)
             Task { @MainActor in
                 terminate()
             }
