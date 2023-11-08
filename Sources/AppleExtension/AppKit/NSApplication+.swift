@@ -47,4 +47,14 @@ public extension NSApplication {
     }
 }
 
+public extension NSApplication {
+    func activeApp() {
+        if #available(macOS 14.0, *) {
+            activate()
+        } else {
+            activate(ignoringOtherApps: true)
+        }
+    }
+}
+
 #endif
