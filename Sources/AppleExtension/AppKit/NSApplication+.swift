@@ -49,11 +49,15 @@ public extension NSApplication {
 
 public extension NSApplication {
     func activeApp() {
+#if swift(>=5.9)
         if #available(macOS 14.0, *) {
             activate()
         } else {
             activate(ignoringOtherApps: true)
         }
+#else
+        activate(ignoringOtherApps: true)
+#endif
     }
 }
 
