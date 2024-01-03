@@ -14,10 +14,17 @@ public extension NEPacketTunnelNetworkSettings {
         public var addresses: [String]
         public var subnetMasks: [String]
         public var includedRoutes: [NEIPv4Route]?
-        public init(addresses: [String], subnetMasks: [String], includedRoutes: [NEIPv4Route]? = nil) {
+        public var excludedRoutes: [NEIPv4Route]?
+
+        public init(addresses: [String],
+                    subnetMasks: [String],
+                    includedRoutes: [NEIPv4Route]? = nil,
+                    excludedRoutes: [NEIPv4Route]? = nil)
+        {
             self.addresses = addresses
             self.subnetMasks = subnetMasks
             self.includedRoutes = includedRoutes
+            self.excludedRoutes = excludedRoutes
         }
     }
 
@@ -25,16 +32,24 @@ public extension NEPacketTunnelNetworkSettings {
         public var addresses: [String]
         public var networkPrefixLengths: [UInt]
         public var includedRoutes: [NEIPv6Route]?
-        public init(addresses: [String], networkPrefixLengths: [UInt], includedRoutes: [NEIPv6Route]? = nil) {
+        public var excludedRoutes: [NEIPv6Route]?
+
+        public init(addresses: [String],
+                    networkPrefixLengths: [UInt],
+                    includedRoutes: [NEIPv6Route]? = nil,
+                    excludedRoutes: [NEIPv6Route]? = nil)
+        {
             self.addresses = addresses
             self.networkPrefixLengths = networkPrefixLengths
             self.includedRoutes = includedRoutes
+            self.excludedRoutes = excludedRoutes
         }
     }
 
     struct DNSConfig {
         public var servers: [String]
         public var matchDomains: [String]?
+
         public init(servers: [String], matchDomains: [String]? = nil) {
             self.servers = servers
             self.matchDomains = matchDomains
@@ -60,41 +75,6 @@ public extension NEPacketTunnelNetworkSettings {
             self.httpsServerAddress = httpsServerAddress
             self.httpsServerPort = httpsServerPort
         }
-
-        public mutating func httpServerAddress(_ address: String) -> Self {
-            self.httpServerAddress = address
-            return self
-        }
-
-        public mutating func httpServerPort(_ port: Int) -> Self {
-            self.httpServerPort = port
-            return self
-        }
-
-        public mutating func httpsServerAddress(_ address: String) -> Self {
-            self.httpsServerAddress = address
-            return self
-        }
-
-        public mutating func httpsServerPort(_ port: Int) -> Self {
-            self.httpsServerPort = port
-            return self
-        }
-
-        mutating func excludeSimpleHostnames(_ exclude: Bool) -> Self {
-            self.excludeSimpleHostnames = exclude
-            return self
-        }
-
-        public mutating func exceptionList(_ list: [String]?) -> Self {
-            self.exceptionList = list
-            return self
-        }
-
-        public mutating func matchDomains(_ domains: [String]?) -> Self {
-            self.matchDomains = domains
-            return self
-        }
     }
 
     convenience init(remoteAddress: String,
@@ -107,25 +87,20 @@ public extension NEPacketTunnelNetworkSettings {
         self.init(tunnelRemoteAddress: remoteAddress)
         if let ipv4Config {
             let ipv4Settings = NEIPv4Settings(addresses: ipv4Config.addresses, subnetMasks: ipv4Config.subnetMasks)
-            if let includedRoutes = ipv4Config.includedRoutes {
-                ipv4Settings.includedRoutes = includedRoutes
-            }
+            ipv4Settings.includedRoutes = ipv4Config.includedRoutes
+            ipv4Settings.excludedRoutes = ipv4Config.excludedRoutes
             self.ipv4Settings = ipv4Settings
         }
         if let ipv6Config {
             let ipv6Settings = NEIPv6Settings(addresses: ipv6Config.addresses, networkPrefixLengths: ipv6Config.networkPrefixLengths.map { NSNumber(value: $0) })
-            if let includedRoutes = ipv6Config.includedRoutes {
-                ipv6Settings.includedRoutes = includedRoutes
-            }
+            ipv6Settings.includedRoutes = ipv6Config.includedRoutes
+            ipv6Settings.excludedRoutes = ipv6Config.excludedRoutes
             self.ipv6Settings = ipv6Settings
         }
         if let dnsConfig {
             let dnsSettings = NEDNSSettings(servers: dnsConfig.servers)
             dnsSettings.matchDomains = dnsConfig.matchDomains
             self.dnsSettings = dnsSettings
-        }
-        if let proxySettings {
-            self.proxySettings = proxySettings
         }
         if let proxyConfig {
             let proxySettings = NEProxySettings()
