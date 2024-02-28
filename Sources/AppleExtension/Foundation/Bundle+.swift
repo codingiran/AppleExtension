@@ -80,3 +80,37 @@ public extension Bundle {
     }
 #endif
 }
+
+// MARK: - Check Sandbox
+
+#if os(macOS)
+
+import Security
+
+#endif
+
+public extension Bundle {
+    var isSandboxed: Bool {
+#if !os(macOS)
+        return true
+#else
+        // https://developer.apple.com/documentation/security
+        // https://stackoverflow.com/a/77050105
+        let defaultFlags: SecCSFlags = .init(rawValue: 0)
+        var staticCode: SecStaticCode?
+        if SecStaticCodeCreateWithPath(bundleURL as CFURL, defaultFlags, &staticCode) == errSecSuccess {
+            if SecStaticCodeCheckValidityWithErrors(staticCode!, SecCSFlags(rawValue: kSecCSBasicValidateOnly), nil, nil) == errSecSuccess {
+                let requirementText = "entitlement[\"com.apple.security.app-sandbox\"] exists" as CFString
+                var sandboxRequirement: SecRequirement?
+                if SecRequirementCreateWithString(requirementText, defaultFlags, &sandboxRequirement) == errSecSuccess {
+                    if SecStaticCodeCheckValidityWithErrors(staticCode!, defaultFlags, sandboxRequirement, nil) == errSecSuccess {
+                        return true
+                    }
+                }
+            }
+        }
+        return false
+
+#endif
+    }
+}
