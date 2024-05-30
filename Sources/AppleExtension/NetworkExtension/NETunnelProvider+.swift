@@ -69,4 +69,21 @@ public extension NETunnelProvider {
     }
 }
 
+public extension NETunnelProvider {
+    func exitProcess(after delay: TimeInterval? = nil) {
+        if let delay {
+            Task {
+                try? await Task.sleep(seconds: 0.2)
+                self.exit()
+            }
+        } else {
+            self.exit()
+        }
+    }
+
+    private func exit(code: Int32 = EXIT_SUCCESS) {
+        _SwiftConcurrencyShims.exit(code)
+    }
+}
+
 #endif
