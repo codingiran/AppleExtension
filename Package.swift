@@ -27,13 +27,8 @@ let package = Package(
             name: "AppleExtension",
             dependencies: [
                 "ObjCExceptionCatcher",
-                "AppleExtensionObjC",
             ],
             resources: [.copy("Resources/PrivacyInfo.xcprivacy")]
-        ),
-        .target(
-            name: "AppleExtensionObjC",
-            publicHeadersPath: "include"
         ),
     ]
 )
