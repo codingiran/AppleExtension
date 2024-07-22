@@ -47,10 +47,12 @@ public extension NEPacketTunnelNetworkSettings {
     }
 
     struct DNSConfig {
+        public var `protocol`: NEPacketTunnelNetworkSettings.DNSConfig.DNSProtocol
         public var servers: [String]
         public var matchDomains: [String]?
 
-        public init(servers: [String], matchDomains: [String]? = nil) {
+        public init(protocol: NEPacketTunnelNetworkSettings.DNSConfig.DNSProtocol, servers: [String], matchDomains: [String]? = nil) {
+            self.protocol = `protocol`
             self.servers = servers
             self.matchDomains = matchDomains
         }
@@ -81,8 +83,6 @@ public extension NEPacketTunnelNetworkSettings {
                      ipv4Config: Ipv4Config? = nil,
                      ipv6Config: Ipv6Config? = nil,
                      dnsConfig: DNSConfig? = nil,
-                     tlsDnsConfig: DNSConfig? = nil,
-                     httpsDnsConfig: DNSConfig? = nil,
                      proxyConfig: ProxyConfig? = nil,
                      mtu: UInt = 1500)
     {
@@ -100,21 +100,25 @@ public extension NEPacketTunnelNetworkSettings {
             self.ipv6Settings = ipv6Settings
         }
         if let dnsConfig {
-            let dnsSettings = NEDNSSettings(servers: dnsConfig.servers)
-            dnsSettings.matchDomains = dnsConfig.matchDomains
+            var dnsSettings: NEDNSSettings?
+            switch dnsConfig.protocol {
+            case .plain:
+                dnsSettings = NEDNSSettings(servers: dnsConfig.servers)
+            case .tls:
+                if #available(iOS 14.0, macOS 11.0, tvOS 17.0, *) {
+                    let dnsSettings = NEDNSOverTLSSettings(servers: [])
+                    dnsSettings.serverName = dnsConfig.servers.first
+                }
+            case .https:
+                if #available(iOS 14.0, macOS 11.0, tvOS 17.0, *) {
+                    let dnsSettings = NEDNSOverHTTPSSettings(servers: [])
+                    let serverURLs = dnsConfig.servers.compactMap { URL(string: $0) }
+                    dnsSettings.serverURL = serverURLs.first
+                    self.dnsSettings = dnsSettings
+                }
+            }
+            dnsSettings?.matchDomains = dnsConfig.matchDomains
             self.dnsSettings = dnsSettings
-        }
-        if #available(iOS 14.0, macOS 11.0, tvOS 17.0, *) {
-            if let tlsDnsConfig {
-                let tlsDnsSettings = NEDNSOverTLSSettings(servers: tlsDnsConfig.servers)
-                tlsDnsSettings.matchDomains = tlsDnsConfig.matchDomains
-                self.dnsSettings = tlsDnsSettings
-            }
-            if let httpsDnsConfig {
-                let httpsDnsSettings = NEDNSOverHTTPSSettings(servers: httpsDnsConfig.servers)
-                httpsDnsSettings.matchDomains = httpsDnsConfig.matchDomains
-                self.dnsSettings = httpsDnsSettings
-            }
         }
         if let proxyConfig {
             let proxySettings = NEProxySettings()
@@ -142,6 +146,32 @@ public extension NEPacketTunnelNetworkSettings {
             self.proxySettings = proxySettings
         }
         self.mtu = NSNumber(value: mtu)
+    }
+}
+
+public extension NEPacketTunnelNetworkSettings.DNSConfig {
+    enum DNSProtocol: String, Codable {
+        case plain
+        case https
+        case tls
+        public static let fallback: DNSProtocol = .plain
+    }
+}
+
+public extension NEPacketTunnelNetworkSettings.DNSConfig {
+    init(nameservers: [String] = [], matchDomains: [String]? = nil) {
+        if nameservers.contains(where: { $0.hasPrefix("https://") }) {
+            self.init(protocol: .https, servers: nameservers, matchDomains: matchDomains)
+        } else if nameservers.contains(where: { $0.hasPrefix("tls://") }) {
+            let servers = nameservers.map { nameserver in
+                var url = nameserver
+                if let range = url.range(of: "tls://") { url.removeSubrange(range) }
+                return url
+            }
+            self.init(protocol: .tls, servers: servers, matchDomains: matchDomains)
+        } else {
+            self.init(protocol: .plain, servers: nameservers, matchDomains: matchDomains)
+        }
     }
 }
 
