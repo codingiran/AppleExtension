@@ -81,6 +81,8 @@ public extension NEPacketTunnelNetworkSettings {
                      ipv4Config: Ipv4Config? = nil,
                      ipv6Config: Ipv6Config? = nil,
                      dnsConfig: DNSConfig? = nil,
+                     tlsDnsConfig: DNSConfig? = nil,
+                     httpsDnsConfig: DNSConfig? = nil,
                      proxyConfig: ProxyConfig? = nil,
                      mtu: UInt = 1500)
     {
@@ -101,6 +103,18 @@ public extension NEPacketTunnelNetworkSettings {
             let dnsSettings = NEDNSSettings(servers: dnsConfig.servers)
             dnsSettings.matchDomains = dnsConfig.matchDomains
             self.dnsSettings = dnsSettings
+        }
+        if #available(iOS 14.0, macOS 11.0, tvOS 17.0, *) {
+            if let tlsDnsConfig {
+                let tlsDnsSettings = NEDNSOverTLSSettings(servers: tlsDnsConfig.servers)
+                tlsDnsSettings.matchDomains = tlsDnsConfig.matchDomains
+                self.dnsSettings = tlsDnsSettings
+            }
+            if let httpsDnsConfig {
+                let httpsDnsSettings = NEDNSOverHTTPSSettings(servers: httpsDnsConfig.servers)
+                httpsDnsSettings.matchDomains = httpsDnsConfig.matchDomains
+                self.dnsSettings = httpsDnsSettings
+            }
         }
         if let proxyConfig {
             let proxySettings = NEProxySettings()
