@@ -11,35 +11,39 @@ import Foundation
 
 public extension Bundle {
     /// App 名称
-    var appDisplayName: String {
-        guard let name = infoDictionary?["CFBundleDisplayName"] as? String else { return "" }
+    var appDisplayName: String? {
+        let name = infoDictionary?["CFBundleDisplayName"] as? String
         return name
     }
 
     /// App 命名空间
-    var namespace: String {
-        guard let namespace = infoDictionary?["CFBundleExecutable"] as? String else { return "" }
+    var namespace: String? {
+        let namespace = infoDictionary?["CFBundleExecutable"] as? String
         return namespace
     }
 
     /// 获取 app 的 Bundle Identifier
-    var appBundleIdentifier: String {
-        return bundleIdentifier ?? ""
+    var appBundleIdentifier: String? {
+        let identifier = bundleIdentifier
+        return identifier
     }
 
     /// Bundle 名称
-    var bundleName: String {
-        return string(forInfoDictionaryKey: "CFBundleName") ?? ""
+    var bundleName: String? {
+        let bundleName = string(forInfoDictionaryKey: "CFBundleName")
+        return bundleName
     }
 
     /// 获取 Bundle Short 版本号
-    var bundleShortVersion: String {
-        return string(forInfoDictionaryKey: "CFBundleShortVersionString") ?? ""
+    var bundleShortVersion: String? {
+        let bundleShortVersion = string(forInfoDictionaryKey: "CFBundleShortVersionString")
+        return bundleShortVersion
     }
 
     /// 获取 Bundle 版本号
-    var bundleVersion: String {
-        return string(forInfoDictionaryKey: "CFBundleVersion") ?? ""
+    var bundleVersion: String? {
+        let bundleVersion = string(forInfoDictionaryKey: "CFBundleVersion")
+        return bundleVersion
     }
 
     /// 从 Info.plist 中根据 key 取值
