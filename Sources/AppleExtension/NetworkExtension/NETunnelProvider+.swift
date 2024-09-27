@@ -73,7 +73,7 @@ public extension NETunnelProvider {
     func exitProcess(after delay: TimeInterval? = nil) {
         if let delay {
             Task {
-                try? await Task.sleep(seconds: 0.2)
+                try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
                 self.exit()
             }
         } else {
@@ -82,7 +82,7 @@ public extension NETunnelProvider {
     }
 
     private func exit(code: Int32 = EXIT_SUCCESS) {
-        _SwiftConcurrencyShims.exit(code)
+        Darwin.exit(code)
     }
 }
 

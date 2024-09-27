@@ -10,7 +10,7 @@
 import Foundation
 import NetworkExtension
 
-extension NEProviderStopReason: CustomStringConvertible {
+extension NEProviderStopReason: @retroactive CustomStringConvertible {
     public var description: String {
         switch self {
         case .userInitiated:
@@ -36,6 +36,7 @@ extension NEProviderStopReason: CustomStringConvertible {
 
         case .idleTimeout:
             return "idleTimeout"
+
         case .configurationDisabled:
             return "configurationDisabled"
 
