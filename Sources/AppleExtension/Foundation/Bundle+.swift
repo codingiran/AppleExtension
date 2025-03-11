@@ -65,7 +65,7 @@ public extension Bundle {
     }
 
 #if !os(macOS)
-    enum AppConfiguration {
+    enum AppConfiguration: Sendable {
         case Debug
         case TestFlight
         case AppStore

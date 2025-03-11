@@ -112,8 +112,7 @@ public extension FileHandle {
     func write(line: String,
                delimiter: String? = "\n",
                encoding: String.Encoding = .utf8,
-               append: Bool = true)
-        throws
+               append: Bool = true) throws
     {
         if append { try seekToFileEnd() }
         if let delimiter, let delimData = delimiter.data(using: encoding) {
@@ -126,8 +125,8 @@ public extension FileHandle {
 
 /// https://stackoverflow.com/questions/53978091/using-pipe-in-swift-app-to-redirect-stdout-into-a-textview-only-runs-in-simul
 /// https://github.com/imfuxiao/Hamster/blob/0debf92cf4909cb15f4b8deee6bd1f2797974c42/General/Logger/Logger.swift#L55
-public class ConsolePipe {
-    public struct StdType: OptionSet {
+public class ConsolePipe: @unchecked Sendable {
+    public struct StdType: OptionSet, Sendable {
         public static let input = StdType(rawValue: 1 << 0)
         public static let output = StdType(rawValue: 1 << 1)
         public static let error = StdType(rawValue: 1 << 2)
@@ -142,7 +141,7 @@ public class ConsolePipe {
     private var outPipe: Pipe?
     private var errPipe: Pipe?
 
-    private var handler: ((FileHandle) -> Void)?
+    private var handler: (@Sendable (FileHandle) -> Void)?
 
     public init(stdType: StdType = [.input, .output, .error]) {
         if stdType.contains(.input) {
@@ -156,7 +155,7 @@ public class ConsolePipe {
         }
     }
 
-    public func listen(_ readabilityHandler: @escaping (FileHandle) -> Void) {
+    public func listen(_ readabilityHandler: @Sendable @escaping (FileHandle) -> Void) {
         handler = readabilityHandler
         // listen stdin
         if let inPipe {
