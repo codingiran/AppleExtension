@@ -59,7 +59,7 @@ public extension Task where Failure == Error {
     }
 }
 
-public struct TaskTimeoutError: LocalizedError {
+public struct TaskTimeoutError: LocalizedError, Sendable {
     public var errorDescription: String? = "Task timed out before completion"
 }
 

@@ -22,7 +22,7 @@ public extension NSApplication {
         }
     }
 
-    enum TerminateResult {
+    enum TerminateResult: Sendable {
         case normal
         case timeout
     }
