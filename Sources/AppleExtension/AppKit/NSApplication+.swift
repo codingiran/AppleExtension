@@ -11,7 +11,7 @@ import AppKit
 import Foundation
 
 public extension NSApplication {
-    static func terminate(after action: (() async -> Void)? = nil) {
+    static func terminate(after action: (@Sendable () async -> Void)? = nil) {
         if let action = action {
             Task {
                 await action()
@@ -27,7 +27,7 @@ public extension NSApplication {
         case timeout
     }
 
-    static func terminate(after action: @escaping () async -> Void, timeout: TimeInterval, callback: ((TerminateResult) async -> Void)? = nil) {
+    static func terminate(after action: @Sendable @escaping () async -> Void, timeout: TimeInterval, callback: (@Sendable (TerminateResult) async -> Void)? = nil) {
         Task {
             let task = Task.detached(timeout: timeout) {
                 await action()

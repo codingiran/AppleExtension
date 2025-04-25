@@ -44,7 +44,7 @@ public extension Task where Failure == Error {
 
             Task<Void, Never> {
                 do {
-                    try await _Concurrency.Task.sleep(nanoseconds: UInt64(timeout) * 1_000_000_000)
+                    try await _Concurrency.Task.sleep(seconds: timeout)
                     if await timeoutActor.markCompleted() {
                         continuation.resume(throwing: TaskTimeoutError())
                     }
@@ -79,7 +79,7 @@ private actor TimeoutActor {
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 public extension Task where Failure == Never, Success == Void {
     @discardableResult
-    init(priority: TaskPriority? = nil, operation: @escaping () async throws -> Void, catch: @escaping (Error) async -> Void) {
+    init(priority: TaskPriority? = nil, operation: @Sendable @escaping () async throws -> Void, catch: @Sendable @escaping (Error) async -> Void) {
         self.init(priority: priority) {
             do {
                 _ = try await operation()
@@ -95,6 +95,11 @@ public extension Task where Failure == Never, Success == Void {
 public extension Task where Success == Never, Failure == Never {
     static func sleep(seconds: TimeInterval) async throws {
         let duration = UInt64(seconds * 1_000_000_000)
+        try await Task.sleep(nanoseconds: duration)
+    }
+
+    static func sleep(milliseconds: UInt64) async throws {
+        let duration = milliseconds * 1_000_000
         try await Task.sleep(nanoseconds: duration)
     }
 }
