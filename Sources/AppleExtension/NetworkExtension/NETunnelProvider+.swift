@@ -73,7 +73,7 @@ public extension NETunnelProvider {
     func exitProcess(after delay: TimeInterval? = nil) {
         if let delay {
             Task {
-                try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+                try? await Task.sleep(seconds: delay)
                 self.exit()
             }
         } else {
