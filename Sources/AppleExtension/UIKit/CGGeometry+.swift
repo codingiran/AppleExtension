@@ -30,6 +30,7 @@ public extension CGFloat {
 
 /// 1个像素点
 #if canImport(UIKit)
+    @MainActor
     static var pixelOne: CGFloat {
         return 1 / UIScreen.main.scale
     }
@@ -43,6 +44,7 @@ public extension CGFloat {
     /// 基于指定的倍数，对 CGFloat 像素取整
     /// - Parameter scale: 指定的倍数，为 nil 则表示以当前设备的屏幕倍数为准
     /// - Returns: 取整后的值
+    @MainActor
     func flat(_ scale: CGFloat? = nil) -> CGFloat {
         var floatValue = self.removeFloatMin()
 #if canImport(UIKit)
@@ -133,6 +135,7 @@ public extension CGPoint {
 
     /// 将一个 CGPoint 像素对齐
     /// - Returns: 取整后的 CGPoint
+    @MainActor
     func flat() -> CGPoint {
         return CGPoint(x: x.flat(), y: y.flat())
     }
@@ -265,6 +268,7 @@ public extension CGSize {
 
     /// 将一个 CGSize 像素对齐
     /// - Returns: 取整后的 CGSize
+    @MainActor
     func flat() -> CGSize {
         return CGSize(width: width.flat(), height: height.flat())
     }
@@ -331,6 +335,7 @@ public extension CGRect {
 
     /// 将一个 CGRect 像素对齐
     /// - Returns: 取整后的 CGRect
+    @MainActor
     func flat() -> CGRect {
         return CGRect(x: origin.x.flat(), y: origin.y.flat(), width: size.width.flat(), height: size.height.flat())
     }
