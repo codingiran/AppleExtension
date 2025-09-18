@@ -1,14 +1,15 @@
 {
+  "originHash" : "159eea3e0ffb7ea9a6611ddd334480975f5b4c085facf2d7707d52d2ecc1392b",
   "pins" : [
     {
       "identity" : "objcexceptioncatcher",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/codingiran/ObjCExceptionCatcher.git",
       "state" : {
-        "revision" : "21561a112472459d54d31bf6fe8bc0c1260a6407",
-        "version" : "1.0.2"
+        "revision" : "7a2498ead583ca37480044bb2c969079a7bd9089",
+        "version" : "1.0.3"
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }
